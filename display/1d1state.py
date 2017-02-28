@@ -12,17 +12,37 @@ running = 1
 
 ca = rownum = None
 
-cellsWidth = 400
+cellsWidth = 8
+
+#how many values each state can take
+stateDepths = [4, 4]
+
+def randomStateProvider(maxIndex):
+    return [random.randint(0, maxIndex) for i in range(maxIndex)]
 
 def reset():
     global ca
-    ca = MultistateAutomata((
-        [[random.randint(0,1)] for i in range(cellsWidth)],
-        [indexedRandomMatrix(3, 2)]
-    ))
+    ca = MultistateAutomata(
+        [[random.randint(0,stateDepth-1) for stateDepth in stateDepths] for i in range(cellsWidth)],
+        [indexedRandomMatrix(3, stateDepth, randomStateProvider) for stateDepth in stateDepths],
+        stateDepths
+    )
     global rownum
     rownum = 0
     screen.fill((0,0,0))
+    print ca.crossStateRules
+
+def resetState():
+    global ca
+    ca = MultistateAutomata(
+        [[random.randint(0, stateDepth - 1) for stateDepth in stateDepths] for i in range(cellsWidth)],
+        ca.ruleTable,
+        stateDepths,
+        ca.crossStateRules
+    )
+    global rownum
+    rownum = 0
+    screen.fill((0, 0, 0))
 
 reset()
 
@@ -32,17 +52,21 @@ while running:
             running = 0
         if event.type == MOUSEBUTTONDOWN:
             reset()
+        if event.type == KEYDOWN:
+            resetState()
 
-    for substate in ca.getCells():
-        for index, cellValue in enumerate(substate):
-            value = cellValue
-            screen.set_at((index, rownum), ((value*255)%256, (value*255)%256, (value*255)%256))
+    for cellIndex, cellValue in enumerate(ca.getCells()):
+        screen.set_at((cellIndex, rownum), stateToColor(cellValue, max(stateDepths)))
+
+    pygame.draw.line(screen, (0, 0, 0), (500, rownum), (500 + len(ca.getCells()), rownum), 1)
+    for mutatedIndex in ca.applyCrossStateRules():
+        screen.set_at((mutatedIndex + 500, rownum), (255,255,255))
 
     rownum += 1
     rownum = rownum if rownum <=400 else 0
     ca.step()
-    #ca.mutateCells(1)
 
-    pygame.display.flip()
+    if rownum % 10 == 0:
+        pygame.display.flip()
 
 pygame.quit()
