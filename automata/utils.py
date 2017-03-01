@@ -7,8 +7,8 @@ def indexByTuple(matrix, indexes):
     return result
 
 def indexedRandomMatrix(numDimensions, maxIndex, randomStateCreator):
-    if numDimensions == 1:
-        return randomStateCreator(maxIndex)
+    if numDimensions == 0:
+        return randomStateCreator()
     return [indexedRandomMatrix(numDimensions - 1, maxIndex, randomStateCreator) for i in range(maxIndex)]
 
 def randomState(stateDepths):
@@ -37,4 +37,8 @@ def stateToColor(state, stateUpperBound):
     else:
         b = r
 
+    r, g, b = int(r), int(g), int(b)
+    # if r+g+b > 200 * 3 :
+    #     print r, b, g
     return (r, g, b)
+
