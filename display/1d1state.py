@@ -8,7 +8,7 @@ from automata.RandomDistribution import RandomDistribution
 import time
 
 pygame.init()
-screen = pygame.display.set_mode((1000, 600))
+screen = pygame.display.set_mode((1000, 1000))
 
 running = 1
 
@@ -16,8 +16,10 @@ ca = rownum = None
 
 cellsWidth = 500
 
+doneDrawing = False
+
 #how many values each state can take
-stateDepths = [6]
+stateDepths = [2, 2, 2]
 
 randomDistribution = RandomDistribution(min(stateDepths) - 1)
 
@@ -32,14 +34,16 @@ def reset():
     ca = MultistateAutomata(
         [[random.randint(0,stateDepth-1) for stateDepth in stateDepths] for i in range(cellsWidth)],
         [indexedRandomMatrix(3, stateDepth, randomSubstateProvider) for stateDepth in stateDepths],
-        stateDepths,
-        {}
+        stateDepths
     )
     global rownum
     rownum = 0
     screen.fill((0,0,0))
     print ca.crossStateRules
     print randomDistribution.distribution
+
+    global doneDrawing
+    doneDrawing = False
 
 def resetState():
     global ca
@@ -55,37 +59,50 @@ def resetState():
     rownum = 0
     screen.fill((0, 0, 0))
 
+    global doneDrawing
+    doneDrawing = False
+
 reset()
 
 while running:
     startTime = time.time()
     for event in pygame.event.get():
+        print event.type
         if event.type == QUIT:
             running = 0
-        if event.type == MOUSEBUTTONDOWN:
-            reset()
+
         if event.type == KEYDOWN:
-            resetState()
+            if event.key == K_RIGHT:
+                reset()
+            if event.key == K_UP:
+                resetState()
+            if event.key == K_DOWN:
+                rownum = 0
+                doneDrawing = False
 
-    for cellIndex, cellValue in enumerate(ca.getCells()):
-        screen.set_at((cellIndex, rownum), stateToColor(cellValue, max(stateDepths) - 1))
+    if not doneDrawing:
+        for cellIndex, cellValue in enumerate(ca.getCells()):
+            screen.set_at((cellIndex, rownum), stateToColor(cellValue, max(stateDepths) - 1))
 
-    pygame.draw.line(screen, (0, 0, 0), (500, rownum), (500 + len(ca.getCells()), rownum), 1)
-    for mutatedIndex in ca.applyCrossStateRules():
-        screen.set_at((mutatedIndex + 500, rownum), (255,255,255))
+        pygame.draw.line(screen, (0, 0, 0), (500, rownum), (500 + len(ca.getCells()), rownum), 1)
+        for mutatedIndex in ca.applyCrossStateRules():
+            screen.set_at((mutatedIndex + 500, rownum), (255,255,255))
 
-    lineDrawnTime = time.time()
+        lineDrawnTime = time.time()
 
-    rownum += 1
-    rownum = rownum if rownum <=600 else 0
-    ca.step()
+        rownum += 1
+        #rownum = rownum if rownum <=1000 else 0
+        if rownum >= 1000:
+            doneDrawing = True
 
-    stepTime = time.time()
+        ca.step()
 
-    if rownum % 100 == 0:
-        pygame.display.update(pygame.Rect(10, 10, 20, 20))
+        stepTime = time.time()
 
-    flipTime = time.time()
+        if rownum % 100 == 0:
+            pygame.display.update(pygame.Rect(10, 10, 20, 20))
+
+        flipTime = time.time()
 
     #print "\n\nline draw: " + str(lineDrawnTime - startTime) + "\nstep: " + str(stepTime - lineDrawnTime) + "\nflip: " + str(flipTime - stepTime)
 

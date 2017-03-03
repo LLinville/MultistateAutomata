@@ -11,7 +11,7 @@ class MultistateAutomata():
 
         if crossStateRules is None:
             self.crossStateRules = {}
-            for i in range(2):
+            for i in range(1):
                 self.addCrossStateRule(utils.randomState(self.stateDepths), utils.randomState(self.stateDepths))
         else:
             self.crossStateRules = crossStateRules
