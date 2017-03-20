@@ -1,7 +1,7 @@
 import random
 import utils
 class MultistateAutomata():
-    def __init__(self, cells, ruleTable, stateDepths, crossStateRules = None):
+    def __init__(self, cells, ruleTable, stateDepths, numCrossStateRules = 0):
         self.stateDepths = stateDepths
         self.cells = cells
         self.width = len(self.cells)
@@ -9,12 +9,9 @@ class MultistateAutomata():
         self.ruleTableWidth = len(self.ruleTable)
         self.kernelWidth = 3
 
-        if crossStateRules is None:
-            self.crossStateRules = {}
-            for i in range(1):
-                self.addCrossStateRule(utils.randomState(self.stateDepths), utils.randomState(self.stateDepths))
-        else:
-            self.crossStateRules = crossStateRules
+        self.crossStateRules = {}
+        for i in range(numCrossStateRules):
+            self.addCrossStateRule(utils.randomState(self.stateDepths), utils.randomState(self.stateDepths))
 
     def addCrossStateRule(self, fromState, toState):
         self.crossStateRules[tuple(fromState)] = toState
