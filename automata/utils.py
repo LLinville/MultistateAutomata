@@ -1,5 +1,10 @@
 import random
 
+randomColorOrder = [[[
+    (random.randint(0,255),
+     random.randint(0, 255),
+     random.randint(0, 255)) for x in range(50)] for y in range(50)] for z in range(50)]
+
 def indexByTuple(matrix, indexes):
     result = matrix[:]
     for index in indexes:
@@ -23,6 +28,23 @@ def circularSlice(array, starting_index, ending_index):
         return part1 + part2
     else:
         return array[starting_index:ending_index]
+
+def stateToRandomColor(state):
+    colorsFromStates = []
+    if not isinstance(state[0], list):
+        state = [state]
+    for substate in state:
+        substate.sort()
+        x = y = z = 0
+        if len(substate) >= 1:
+            x = substate[0]
+        if len(substate) >= 2:
+            y = substate[1]
+        if len(substate) >= 3:
+            z = substate[2]
+
+        colorsFromStates.append(randomColorOrder[x][y][z])
+    return reduce(lambda x,y: (x[0]^y[0], x[1]^y[1], x[2]^y[2]), colorsFromStates)
 
 def stateToColor(state, stateUpperBound):
     r = 1.0 * state[0] / stateUpperBound * 255

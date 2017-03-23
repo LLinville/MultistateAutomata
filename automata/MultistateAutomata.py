@@ -4,14 +4,19 @@ class MultistateAutomata():
     def __init__(self, cells, ruleTable, stateDepths, numCrossStateRules = 0):
         self.stateDepths = stateDepths
         self.cells = cells
+        self.neighborhoods = cells
         self.width = len(self.cells)
         self.ruleTable = ruleTable
         self.ruleTableWidth = len(self.ruleTable)
         self.kernelWidth = 3
 
         self.crossStateRules = {}
-        for i in range(numCrossStateRules):
-            self.addCrossStateRule(utils.randomState(self.stateDepths), utils.randomState(self.stateDepths))
+
+        if numCrossStateRules is not 0:
+            for i in range(numCrossStateRules):
+                randomStartState = utils.randomState(self.stateDepths)
+                randomEndState = utils.randomState(self.stateDepths)
+                self.addCrossStateRule(randomStartState, randomEndState)
 
     def addCrossStateRule(self, fromState, toState):
         self.crossStateRules[tuple(fromState)] = toState
@@ -27,6 +32,9 @@ class MultistateAutomata():
                 mutatedIndexes.append(cellIndex)
         return mutatedIndexes
 
+    def getNeighborhoods(self):
+        return self.neighborhoods
+
     def step(self):
         newCells = [0 for i in range(self.width)]
         for cellIndex, currentValue in enumerate(self.cells):
@@ -40,3 +48,6 @@ class MultistateAutomata():
                 newState[subruleIndex] = nextSubstate
             newCells[cellIndex] = newState
         self.cells = newCells
+        self.neighborhoods = [utils.circularSlice(self.cells,
+                        (cellIndex - self.kernelWidth/2),
+                        (cellIndex + self.kernelWidth/2 + 1)) for cellIndex in range(self.width)]

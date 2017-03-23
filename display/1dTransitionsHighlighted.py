@@ -38,7 +38,7 @@ def reset():
         [[random.randint(0,stateDepth-1) for stateDepth in stateDepths] for i in range(cellsWidth)],
         [rulegenerator.getRandomSingleStateRule(stateDepth, True) for stateDepth in stateDepths],
         stateDepths,
-        numCrossStateRules=1
+        numCrossStateRules=0
     )
     global rownum
     rownum = 0
@@ -96,8 +96,10 @@ while running:
             screen.set_at((cellIndex, rownum), stateToColor(cellValue, max(stateDepths) - 1))
 
         pygame.draw.line(screen, (0, 0, 0), (500, rownum), (500 + len(ca.getCells()), rownum), 1)
-        for mutatedIndex in ca.applyCrossStateRules():
-            screen.set_at((mutatedIndex + 500, rownum), (255,255,255))
+
+        for neighborhoodIndex, neighborhoodStates in enumerate(ca.getNeighborhoods()):
+            neighborhoodStates.sort()
+            screen.set_at((neighborhoodIndex + 500, rownum), stateToRandomColor(ca.getNeighborhoods()[neighborhoodIndex]))
 
         lineDrawnTime = time.time()
 
@@ -111,7 +113,7 @@ while running:
         stepTime = time.time()
 
         if rownum % 100 == 0:
-            pygame.display.update(pygame.Rect(10, 10, 20, 20))
+            pygame.display.update(pygame.Rect(10, 10, 200, 200))
 
         flipTime = time.time()
 
