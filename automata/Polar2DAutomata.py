@@ -101,11 +101,11 @@ class Polar2DAutomata():
         return math.atan2(y, x), math.sqrt(x * x + y * y)
 
     def getCellColors(self):
-        polarStates = [self.toPolar(cell[0], cell[1]) for cell in self.cells]
+        polarStates = [utils.toPolar(cell[0], cell[1]) for cell in self.cells]
         return [self.stateToColor(polarState) for polarState in polarStates]
 
     def stateToColor(self, state):
-        state = self.toPolar(state[0], state[1])
+        state = utils.toPolar(state[0], state[1])
         color = colorsys.hsv_to_rgb(state[0], 1, self.sigmoid(state[1]))
         return [int(component * 255) for component in color]
 

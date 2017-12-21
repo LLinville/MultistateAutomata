@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 from automata.Polar2DAutomata import Polar2DAutomata
+from automata.Cartesian2DAutomata import Cartesian2DAutomata
 from random import *
 from numpy import *
 import time
@@ -74,8 +75,12 @@ class AutomataDisplay:
         pygame.display.flip()
 
 
-automaton = Polar2DAutomata(200)
+automaton = Cartesian2DAutomata(200)
+transitionTable = [[(1.0 * x / automaton.transitionSlots, 1.0 * y / automaton.transitionSlots)
+                    for x in range(automaton.transitionSlots)]
+                    for y in range(automaton.transitionSlots)]
+automaton.setTransitionTable(transitionTable)
 automaton.randomizeState()
-automaton.randomizeRules()
+#automaton.randomizeRules()
 display = AutomataDisplay((600,600), automaton)
 display.run()

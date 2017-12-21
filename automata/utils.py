@@ -1,4 +1,5 @@
 import random
+import math
 
 randomColorOrder = [[[
     (random.randint(0,255),
@@ -76,3 +77,13 @@ def randomLines():
                 grid[row][randCol] = randState
 
     return grid
+
+def toXY(theta, radius):
+    return radius * math.cos(theta), radius * math.sin(theta)
+
+def toPolar(x, y):
+    return math.atan2(y, x) / 2.0 / math.pi, math.sqrt(x * x + y * y)
+
+def rotateXY(x, y, theta):
+    polar = toPolar(x, y)
+    return toXY(polar[0] + theta, polar[1])
