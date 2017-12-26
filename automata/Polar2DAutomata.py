@@ -16,8 +16,8 @@ class Polar2DAutomata():
         self.transitionTable = []
 
     def indexedTransition(self, thetaIndex, rIndex):
-        thetaIndex = int(thetaIndex % self.thetaSlots)
-        rIndex = int(rIndex % self.rSlots)
+        thetaIndex = int((self.sigmoid(thetaIndex)) % self.thetaSlots)
+        rIndex = int((self.sigmoid(rIndex)) % self.rSlots)
         return self.transitionTable[thetaIndex][rIndex]
 
     def transition(self, (x, y)):

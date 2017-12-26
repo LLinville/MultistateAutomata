@@ -87,3 +87,6 @@ def toPolar(x, y):
 def rotateXY(x, y, theta):
     polar = toPolar(x, y)
     return toXY(polar[0] + theta, polar[1])
+
+def normalKernel(width, standardDeviations = 3):
+    return [1.0 / math.sqrt(2 * math.pi) * math.exp(-(x - 1) ** 2 / 2) for x in [0 - width / 2]]

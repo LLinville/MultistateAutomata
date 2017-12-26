@@ -7,7 +7,7 @@ import pygame
 automaton = Cartesian2DAutomata(1)
 automaton.randomizeState()
 #automaton.randomizeRules()
-transitionTable = [[(1.0 * x / automaton.transitionSlots - 0.5, 1.0 * y / automaton.transitionSlots - 0.5)
+transitionTable = [[(1.0 * x / automaton.transitionSlots, 1.0 * y / automaton.transitionSlots)
                     for x in range(automaton.transitionSlots)]
                     for y in range(automaton.transitionSlots)]
 automaton.setTransitionTable(transitionTable)
