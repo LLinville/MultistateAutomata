@@ -9,13 +9,18 @@ import time
 import automata.utils as utils
 
 class AutomataDisplay:
-    def __init__(self, screenDimensions, automaton):
+    def __init__(self, automaton):
         pygame.init()
-        self.screen = pygame.display.set_mode(screenDimensions)
+        self.cellDrawScale = 4
+        self.screenDimensions = ((automaton.numCells + automaton.transitionSlots) * self.cellDrawScale + 200, 300 * self.cellDrawScale)
+        self.screen = pygame.display.set_mode(self.screenDimensions)
         self.automaton = automaton
-        self.screenDimensions = screenDimensions
-        self.cellDrawScale = 3
         self.randomSkewMultiplier = 0.005
+
+        self.maxSavedStates = 10
+        self.savedStates = []
+        self.numSavedSamplePoints = 10
+        self.savedSamplePoints = range(0, automaton.numCells, automaton.numCells / self.numSavedSamplePoints)
         self.resetState()
         self.resetDisplay(True)
 
@@ -91,9 +96,13 @@ class AutomataDisplay:
                 #     self.drawTable(self.automaton.numCells * self.cellDrawScale + 100, 100)
                 #     pygame.display.flip()
 
-                t = 0.01
+                t = 0
                 transform = [[cos(t), -sin(t)], [sin(t), cos(t)]]
-                self.automaton.step(neighborKernel=utils.normalKernel(5), normalize=True, gradientMultiplier=None, transformMatrix=transform)
+                kernel = utils.gaussianKernel(sigma=2)
+                kernel = [1 - x for x in kernel]
+                self.automaton.step(neighborKernel=kernel, normalize=True, gradientMultiplier=None, transformMatrix=transform)
+
+                self.saveAutomatonState()
 
                 stepTime = time.time()
 
@@ -126,6 +135,9 @@ class AutomataDisplay:
                     pygame.draw.rect(self.screen, transitionTable[rowIndex][valueIndex], (x + valueIndex * self.cellDrawScale, y + rowIndex * self.cellDrawScale, self.cellDrawScale, self.cellDrawScale))
         pygame.display.flip()
 
+    def drawSavedStates(self, decayFactor = 0.9):
+
+
     def resetState(self):
         state = [utils.toXY(angle, cos(angle)) for angle in
                  [thetaValue * math.pi / 2 / automaton.numCells for thetaValue in range(automaton.numCells)]]
@@ -138,6 +150,10 @@ class AutomataDisplay:
         if randomizeState:
             self.automaton.randomizeState()
         pygame.display.flip()
+
+    def saveAutomatonState(self):
+        self.savedStates.append([automaton.cells[index] for index in self.savedSamplePoints])
+        self.savedStates = self.savedStates[1:]
 
 
 automaton = Cartesian2DAutomata(300)
@@ -152,5 +168,5 @@ automaton = Cartesian2DAutomata(300)
 #automaton.setState([utils.toXY(1.0 * cellIndex / automaton.numCells, 1.0 * cellIndex / automaton.numCells) for cellIndex in range(automaton.numCells)])
 #automaton.randomizeState()
 automaton.randomizeRules((automaton.tweakedTotal, automaton.tweakedTotal))
-display = AutomataDisplay((1500,900), automaton)
+display = AutomataDisplay(automaton)
 display.run()

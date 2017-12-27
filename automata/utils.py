@@ -88,5 +88,10 @@ def rotateXY(x, y, theta):
     polar = toPolar(x, y)
     return toXY(polar[0] + theta, polar[1])
 
-def normalKernel(width, standardDeviations = 3):
-    return [1.0 / math.sqrt(2 * math.pi) * math.exp(-(x - 1) ** 2 / 2) for x in [0 - width / 2]]
+from math import pi, sqrt, exp
+
+def gaussianKernel(n=5,sigma=1):
+    r = range(-int(n/2),int(n/2)+1)
+    kernel = [1 / (sigma * sqrt(2*pi)) * exp(-float(x)**2/(2*sigma**2)) for x in r]
+    scaleFactor = 1.0 / max(kernel)
+    return [value * scaleFactor for value in kernel]
